@@ -17,6 +17,21 @@ return [
     'app_name' => env('APP_NAME', 'skeleton'),
     'app_key' => env('APP_KEY', ''),
     'server_name' => env('SERVER_NAME', 'Hyperf'),
+
+    /**
+     * JWT Configuration
+     */
+    'jwt' => [
+        'access_token_secret' => env('ACCESS_TOKEN_SECRET', 'hyperf'),
+        'refresh_token_secret' => env('REFRESH_TOKEN_SECRET', 'hyperf'),
+        'algo' => env('JWT_ALGO', 'HS256'),
+        'ttl' => (int) env('JWT_TTL', 60),
+        'refresh_ttl' => (int) env('JWT_REFRESH_TTL', 20160),
+    ],
+
+    /**
+     * Hashing Secret Key
+     */
     'hashing' => [
         'default' => [
             'rounds' => (int) env('HASH_ROUNDS', 8),

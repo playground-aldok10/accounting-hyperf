@@ -24,36 +24,37 @@ use Hyperf\HttpServer\Annotation\PostMapping;
 class AuthController extends BaseApiController
 {
     #[Inject]
-    protected DefaultHasher $hash;
+    protected DefaultHasher  $hash;
 
     #[PostMapping(path: 'login')]
     public function login(LoginRequest $request)
-    {
-        $email = $request->input('email');
-        $password = $request->input('password');
-        
-        $user = User::where('email', $email)->first();
+    {   
+        if(!$user = User::authenticated($request)){
+            return $this->responseError('Login failed. Wrong email or password!');
+        }
 
-        $isValidPassword = $this->hash->check($password, $user->password);
-        
-        return $this->response([
-            $user,
-            $email,
-            $isValidPassword
-        ]);
+        return $this->response(
+            message: 'Login Success',
+            data: $user
+        );
     }
 
     #[PostMapping(path: 'register')]
     public function register(RegisterRequest $request)
     {
-        $email = $request->input('email');
         $password = $request->input('password');
 
-        $user = User::create([
-            'email' => $email,
+        User::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
             'password' => $this->hash->make($password)
         ]);
 
-        return $this->response($user, 'Ok');
+        $user = User::authenticated($request);
+
+        return $this->response(
+            message: 'Registes Success',
+            data: $user
+        );
     }
 }
