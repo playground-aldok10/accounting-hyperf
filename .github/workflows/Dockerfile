@@ -5,16 +5,16 @@
 # @contact  group@hyperf.io
 # @license  https://github.com/hyperf/hyperf/blob/master/LICENSE
 
-FROM hyperf/hyperf:8.0-alpine-v3.16-swoole
+FROM hyperf/hyperf:8.1-alpine-v3.16-swoole
 LABEL maintainer="Hyperf Developers <group@hyperf.io>" version="1.0" license="MIT" app.name="Hyperf"
 
 ##
 # ---------- env settings ----------
 ##
-# --build-arg timezone=Asia/Shanghai
+# --build-arg timezone=Asia/Jakarta
 ARG timezone
 
-ENV TIMEZONE=${timezone:-"Asia/Shanghai"} \
+ENV TIMEZONE=${timezone:-"Asia/Jakarta"} \
     APP_ENV=prod \
     SCAN_CACHEABLE=(true)
 
