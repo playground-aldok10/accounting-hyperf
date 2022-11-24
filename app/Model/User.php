@@ -53,13 +53,13 @@ class User extends Model
     {
         $password = $request->input('password');
 
-        User::create([
+        $query->create([
             'name' => $request->input('name'),
             'email' => $request->input('email'),
             'password' => (new DefaultHasher)->make($password)
         ]);
 
-        return User::authenticated($request);
+        return self::authenticated($request);
     }
 
     /**
