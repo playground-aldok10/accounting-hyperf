@@ -61,7 +61,7 @@ class JWT
 
     protected function generateRefreshToken()
     {
-        $jti = $this->jti('sha512');
+        $jti = $this->jti('sha1');
         return BaseJwt::encode(
             [
                 'iss' => $this->request->url(),
@@ -71,7 +71,7 @@ class JWT
                 'exp' => $this->expiresAt($this->refresh_ttl),
                 'jti' => $jti,
                 'scope' => self::REFRESH_TOKEN,
-                'at_hash' => $this->atHash('sha1', $jti)
+                'at_hash' => $this->atHash('md5', $jti)
             ],
             $this->access_token_secret,
             $this->algo
