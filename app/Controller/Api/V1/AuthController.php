@@ -16,8 +16,6 @@ use App\Middleware\JwtAuthMiddleware;
 use App\Model\User;
 use App\Request\LoginRequest;
 use App\Request\RegisterRequest;
-use Components\Hashing\DefaultHasher;
-use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -27,9 +25,6 @@ use Hyperf\HttpServer\Contract\RequestInterface;
 #[Controller(prefix: 'api/v1/auth')]
 class AuthController extends BaseApiController
 {
-    #[Inject]
-    protected DefaultHasher  $hash;
-
     #[PostMapping(path: 'login')]
     public function login(LoginRequest $request)
     {   
@@ -46,25 +41,15 @@ class AuthController extends BaseApiController
     #[PostMapping(path: 'register')]
     public function register(RegisterRequest $request)
     {
-        $password = $request->input('password');
-
-        User::create([
-            'name' => $request->input('name'),
-            'email' => $request->input('email'),
-            'password' => $this->hash->make($password)
-        ]);
-
-        $user = User::authenticated($request);
-
         return $this->response(
             message: 'Register Success',
-            data: $user
+            data: User::createNewAccount($request)
         );
     }
 
     #[GetMapping(path: 'me')]
     #[Middleware(JwtAuthMiddleware::class)]
-    public function me(RequestInterface $request)
+    public function me()
     {
         return $this->response(
             message: 'Success',

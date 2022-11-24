@@ -49,6 +49,22 @@ class User extends Model
     /**
      * 
      */
+    public static function scopeCreateNewAccount($query, LoginRequest|RegisterRequest $request)
+    {
+        $password = $request->input('password');
+
+        User::create([
+            'name' => $request->input('name'),
+            'email' => $request->input('email'),
+            'password' => (new DefaultHasher)->make($password)
+        ]);
+
+        return User::authenticated($request);
+    }
+
+    /**
+     * 
+     */
     public static function scopeAuthenticated($query, LoginRequest|RegisterRequest $request)
     {
         $email = $request->input('email');
