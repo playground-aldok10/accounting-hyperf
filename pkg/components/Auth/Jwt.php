@@ -1,6 +1,6 @@
 <?php
 
-namespace Components\JWT;
+namespace Components\Auth;
 
 use App\Model\User;
 use Firebase\JWT\JWT as BaseJwt;
@@ -14,7 +14,8 @@ class JWT
     public const ACCESS_TOKEN = 'ACCESS_TOKEN';
     public const REFRESH_TOKEN = 'REFRESH_TOKEN';
 
-    public Key $key;
+    public Key $key1;
+    public Key $key2;
 
     public function __construct(
         RequestInterface $request = new RequestInterface,
@@ -27,10 +28,11 @@ class JWT
         $this->currentTime = time();
         $this->request = $request;
         $this->user = $user;
-        $this->key = new Key($this->access_token_secret, $this->algo);
+        $this->key1 = new Key($this->access_token_secret, $this->algo);
+        $this->key2 = new Key($this->refresh_token_secret, $this->algo);
     }
 
-    public function encode()
+    public function generateToken()
     {
         return [
             'type' => self::TYPE,
@@ -74,6 +76,69 @@ class JWT
             $this->access_token_secret,
             $this->algo
         );
+    }
+
+    public function validateToken()
+    {
+        $token = $this->decodeAccessToken();
+
+        $isExpiredToken = $token->exp < time();
+        $isInvalidScope = $token->scope != self::ACCESS_TOKEN;
+        if ($isExpiredToken || $isInvalidScope) {
+            return false;
+        }
+
+        return $token;
+    }
+
+    public function validateRefreshToken()
+    {
+        $token = $this->decodeRefreshToken();
+
+        $isExpiredToken = $token->exp < time();
+        $isInvalidScope = $token->scope != self::REFRESH_TOKEN;
+        if ($isExpiredToken || $isInvalidScope) {
+            return false;
+        }
+
+        return $token;
+    }
+
+    public function decodeAccessToken()
+    {
+        if (!$bearerToken = $this->bearerToken()) {
+            return false;
+        }
+        
+        return $this->decode($bearerToken, $this->key1);
+        
+    }
+
+    public function decode(string $jwt, Key $key)
+    {
+        try {
+            return BaseJwt::decode($jwt, $key);
+        } catch (\Throwable $th) {
+            return false;
+        }
+    }
+
+    public function decodeRefreshToken()
+    {
+        if (!$bearerToken = $this->bearerToken()) {
+            return false;
+        }
+        
+        return $this->decode($bearerToken, $this->key2);
+    }
+
+    protected function bearerToken()
+    {
+        if (preg_match('/Bearer\s(\S+)/', $this->request->header('Authorization'), $matches)) {
+            return $matches[1];
+        }
+
+        return false;
     }
 
     protected function expiresAt(int $ttl = null)

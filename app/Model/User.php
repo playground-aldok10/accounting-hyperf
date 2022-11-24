@@ -7,8 +7,9 @@ namespace App\Model;
 use App\Request\LoginRequest;
 use App\Request\RegisterRequest;
 use Components\Hashing\DefaultHasher;
-use Components\JWT\JWT;
+use Components\Auth\JWT;
 use Hyperf\Database\Model\SoftDeletes;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 /**
  * @property int $id 
@@ -64,11 +65,27 @@ class User extends Model
             $jwt = new JWT($request, $user);
 
             return [
-                'token' => $jwt->encode(),
+                'token' => $jwt->generateToken(),
                 'user' => $user,
             ];
         }
 
         return false;
+    }
+
+    /**
+     * 
+     */
+    public static function scopeValidateToken($query, RequestInterface $request)
+    {
+        $jwt = new JWT($request);
+
+        $token = $jwt->validateToken();
+
+        if (!$user = $query->find($token->sub)) {
+            return false;
+        }
+
+        return $user;
     }
 }

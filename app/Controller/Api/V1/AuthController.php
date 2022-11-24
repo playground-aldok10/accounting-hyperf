@@ -16,9 +16,12 @@ use App\Model\User;
 use App\Request\LoginRequest;
 use App\Request\RegisterRequest;
 use Components\Hashing\DefaultHasher;
+use Components\Auth\JWT;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
+use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\PostMapping;
+use Hyperf\HttpServer\Contract\RequestInterface;
 
 #[Controller(prefix: 'api/v1/auth')]
 class AuthController extends BaseApiController
@@ -53,8 +56,17 @@ class AuthController extends BaseApiController
         $user = User::authenticated($request);
 
         return $this->response(
-            message: 'Registes Success',
+            message: 'Register Success',
             data: $user
+        );
+    }
+
+    #[GetMapping(path: 'me')]
+    public function me(RequestInterface $request)
+    {
+        return $this->response(
+            message: 'Success',
+            data: User::validateToken($request)
         );
     }
 }
