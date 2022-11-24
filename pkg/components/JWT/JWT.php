@@ -52,7 +52,6 @@ class JWT
                 'exp' => $this->expiresAt($this->ttl),
                 'jti' => $jti,
                 'scope' => self::ACCESS_TOKEN,
-                'at_hash' => $this->atHash('md4', $jti)
             ],
             $this->access_token_secret,
             $this->algo
@@ -71,7 +70,6 @@ class JWT
                 'exp' => $this->expiresAt($this->refresh_ttl),
                 'jti' => $jti,
                 'scope' => self::REFRESH_TOKEN,
-                'at_hash' => $this->atHash('md5', $jti)
             ],
             $this->access_token_secret,
             $this->algo
@@ -86,10 +84,5 @@ class JWT
     protected function jti(string $algo = 'sha1')
     {
         return hash($algo, $this->currentTime . $this->access_token_secret . $this->user->updated_at);
-    }
-
-    protected function atHash(string $algo = 'sha1', string $jti = '')
-    {
-        return hash($algo, $jti . $this->user->email . $this->user->updated_at);
     }
 }
