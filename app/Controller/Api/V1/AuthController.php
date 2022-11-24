@@ -12,14 +12,15 @@ declare(strict_types=1);
 namespace App\Controller\Api\V1;
 
 use App\Controller\Api\BaseApiController;
+use App\Middleware\JwtAuthMiddleware;
 use App\Model\User;
 use App\Request\LoginRequest;
 use App\Request\RegisterRequest;
 use Components\Hashing\DefaultHasher;
-use Components\Auth\JWT;
 use Hyperf\Di\Annotation\Inject;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
+use Hyperf\HttpServer\Annotation\Middleware;
 use Hyperf\HttpServer\Annotation\PostMapping;
 use Hyperf\HttpServer\Contract\RequestInterface;
 
@@ -62,11 +63,12 @@ class AuthController extends BaseApiController
     }
 
     #[GetMapping(path: 'me')]
+    #[Middleware(JwtAuthMiddleware::class)]
     public function me(RequestInterface $request)
     {
         return $this->response(
             message: 'Success',
-            data: User::validateToken($request)
+            data: $this->container->userData
         );
     }
 }

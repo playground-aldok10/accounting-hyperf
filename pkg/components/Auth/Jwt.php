@@ -80,7 +80,9 @@ class JWT
 
     public function validateToken()
     {
-        $token = $this->decodeAccessToken();
+        if (!$token = $this->decodeAccessToken()){
+            return false;
+        }
 
         $isExpiredToken = $token->exp < time();
         $isInvalidScope = $token->scope != self::ACCESS_TOKEN;
@@ -93,7 +95,9 @@ class JWT
 
     public function validateRefreshToken()
     {
-        $token = $this->decodeRefreshToken();
+        if (!$token = $this->decodeRefreshToken()){
+            return false;
+        }
 
         $isExpiredToken = $token->exp < time();
         $isInvalidScope = $token->scope != self::REFRESH_TOKEN;

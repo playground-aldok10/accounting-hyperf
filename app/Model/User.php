@@ -82,7 +82,7 @@ class User extends Model
 
         $token = $jwt->validateToken();
 
-        if (!$user = $query->find($token->sub)) {
+        if (!$token || !$user = $query->find($token->sub)) {
             return false;
         }
 
