@@ -16,6 +16,7 @@ use App\Middleware\JwtAuthMiddleware;
 use App\Model\User;
 use App\Request\LoginRequest;
 use App\Request\RegisterRequest;
+use Hyperf\Context\Context;
 use Hyperf\HttpServer\Annotation\Controller;
 use Hyperf\HttpServer\Annotation\GetMapping;
 use Hyperf\HttpServer\Annotation\Middleware;
@@ -53,7 +54,7 @@ class AuthController extends BaseApiController
     {
         return $this->response(
             message: 'Success',
-            data: $this->container->userData
+            data: Context::get(JwtAuthMiddleware::USER_CONTEXT_KEY)
         );
     }
 }
