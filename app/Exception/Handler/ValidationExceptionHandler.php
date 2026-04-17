@@ -29,9 +29,9 @@ class ValidationExceptionHandler extends ExceptionHandler
 
         /** @var \Hyperf\Validation\ValidationException $throwable */
         $errors = $throwable->validator->errors();
-        $body = ['status' => 0, 'error_code' => 400, 'errors' => $errors];
+        $body = ['status' => 0, 'error_code' => 422, 'message' => 'The given data was invalid.', 'errors' => $errors];
 
-        return $response->withHeader('Server', config('server_name'))->withStatus(400)->withBody(new SwooleStream(json_encode($body)));
+        return $response->withHeader('Server', config('server_name'))->withStatus(422)->withBody(new SwooleStream(json_encode($body)));
     }
 
     public function isValid(Throwable $throwable): bool

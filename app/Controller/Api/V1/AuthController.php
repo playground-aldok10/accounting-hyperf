@@ -27,9 +27,12 @@ class AuthController extends BaseApiController
 {
     #[PostMapping(path: 'login')]
     public function login(LoginRequest $request)
-    {   
-        if(!$user = User::authenticated($request)){
-            return $this->responseError('Login failed. Wrong email or password!');
+    {
+        if (! $user = User::authenticated($request)) {
+            return $this->responseError(
+                message: 'Login failed. Wrong email or password!',
+                status: 401
+            );
         }
 
         return $this->response(
@@ -41,9 +44,17 @@ class AuthController extends BaseApiController
     #[PostMapping(path: 'register')]
     public function register(RegisterRequest $request)
     {
+        if (! $account = User::createNewAccount($request)) {
+            return $this->responseError(
+                message: 'Registration failed. Please try again.',
+                status: 500
+            );
+        }
+
         return $this->response(
             message: 'Register Success',
-            data: User::createNewAccount($request)
+            data: $account,
+            status: 201
         );
     }
 
