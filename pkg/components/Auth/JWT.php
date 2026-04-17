@@ -73,7 +73,7 @@ class JWT
                 'jti' => $jti,
                 'scope' => self::REFRESH_TOKEN,
             ],
-            $this->access_token_secret,
+            $this->refresh_token_secret,
             $this->algo
         );
     }
@@ -138,16 +138,17 @@ class JWT
 
     protected function bearerToken()
     {
-        if (preg_match('/Bearer\s(\S+)/', $this->request->header('Authorization'), $matches)) {
+        $header = (string) $this->request->header('Authorization', '');
+        if ($header !== '' && preg_match('/Bearer\s(\S+)/', $header, $matches)) {
             return $matches[1];
         }
 
         return false;
     }
 
-    protected function expiresAt(int $ttl = null)
+    protected function expiresAt(?int $ttl = null)
     {
-        return $this->currentTime + ((int)$ttl * 60);
+        return $this->currentTime + ((int) $ttl * 60);
     }
 
     protected function jti(string $algo = 'sha1')
