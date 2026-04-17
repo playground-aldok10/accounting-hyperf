@@ -39,7 +39,7 @@ class JwtAuthMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        if(!$user = User::validateToken($this->request)){
+        if (! $user = User::validateToken($this->request)) {
             return $this->response->json(
                 [
                     'status' => 0,
@@ -48,8 +48,8 @@ class JwtAuthMiddleware implements MiddlewareInterface
                         'error' => 'The token is invalid, preventing further execution.',
                     ],
                 ]
-            );
-        };
+            )->withStatus(401);
+        }
 
         $this->container->userData = $user;
 
